@@ -13,7 +13,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-const [, , url, out, cookieValue, widthArg, heightArg] = process.argv;
+const [, , url, out, cookieValue, widthArg, heightArg, clickSel] = process.argv;
 const width = Number(widthArg || 430);
 const height = Number(heightArg || 932);
 
@@ -86,6 +86,13 @@ if (cookieValue) {
 
 await send('Page.navigate', { url });
 await sleep(1200);   // 等前端 fetch /api/me 回来并渲染
+
+if (clickSel) {       // 可选：点一下某个元素（比如打开发布弹层）再截
+  await send('Runtime.evaluate', {
+    expression: "document.querySelector('" + clickSel + "')?.click()",
+  });
+  await sleep(600);
+}
 
 const shot = await send('Page.captureScreenshot', { format: 'png' });
 fs.writeFileSync(out, Buffer.from(shot.data, 'base64'));

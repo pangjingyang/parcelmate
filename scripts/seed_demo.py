@@ -1,4 +1,4 @@
-"""造一份演示数据：一个宿舍 + 4 个成员 + 3 张快递单（其中 1 张已被接走）。
+﻿"""造一份演示数据：一个宿舍 + 4 个成员 + 3 张快递单（其中 1 张已被接走）。
 
 用法：
     python seed_demo.py                       # 默认打本机 8080
@@ -73,11 +73,11 @@ def main():
 
     # 3. 小明发三张单
     payloads = [
-        {"courier": "中通", "station": "菜鸟驿站", "pickupCode": "8-3-1024",
+        {"station": "菜鸟驿站", "pickupCode": "8-3-1024",
          "deadline": "2026-11-11T20:30", "reward": "一杯奶茶"},
-        {"courier": "顺丰", "station": "丰巢快递柜", "pickupCode": "A12-4471",
+        {"station": "顺丰快递", "pickupCode": "A12-4471",
          "deadline": "2026-11-11T12:00", "reward": "免费"},
-        {"courier": "京东", "station": "京东快递", "pickupCode": None,
+        {"station": "京东快递", "pickupCode": None,
          "deadline": None, "reward": "一杯奶茶"},
     ]
     parcels = []
@@ -96,7 +96,7 @@ def main():
         "roomName": room["name"],
         "members": [{"nickname": n, "id": mid} for n, (_, mid) in students.items()],
         "parcels": [
-            {"id": p["id"], "courier": p["courier"], "status": "TAKEN" if p["id"] == parcels[1]["id"] else "OPEN"}
+            {"id": p["id"], "station": p["station"], "status": "TAKEN" if p["id"] == parcels[1]["id"] else "OPEN"}
             for p in parcels
         ],
         "next": "手机打开 %s → 输房间码 %s → 昵称随便（如「学长」）→ 就能看到 2 张待接 + 1 张已接" % (BASE, code),

@@ -1,4 +1,4 @@
-﻿# 求你了 · 宿舍快递代取登记（ParcelMate）
+# 求你了 · 宿舍快递代取登记（ParcelMate）
 
 > 宿舍群里那句「谁帮我取一下快递」，从满屏聊天记录变成一张能追踪状态的小卡片。
 
@@ -17,15 +17,15 @@ ParcelMate 把这个流程做成**一张卡片带状态**：
 ```
 
 - 一个宿舍一个**房间码**，室友输入码 + 昵称就能进，不需要注册账号
-- 发布时填：快递公司 / 取件点 / **取件码** / 期望时间 / 悬赏（"一杯奶茶"）
+- 发布时填：**取件点**（菜鸟 / 京东 / 多多 / 兔喜 / 顺丰 / 邮政）/ **取件码** / 期望时间 / 悬赏（"一杯奶茶"）
 - 取件码只有**发布者**和**接单人**看得到，其他人看到的是隐藏状态
 - 谁接的单、哪一步超时了，状态都标得清清楚楚
 
 ## 截图
 
-| 加入宿舍 | 快递看板（手机） |
-| --- | --- |
-| ![欢迎页](docs/shots/welcome.png) | ![看板](docs/shots/app-online.png) |
+| 加入宿舍 | 快递看板（手机） | 发布快递 |
+| --- | --- | --- |
+| ![欢迎页](docs/shots/welcome.png) | ![看板](docs/shots/app-online.png) | ![发布](docs/shots/publish.png) |
 
 > 上面第二张是线上实例的真实截图：阿里云 Ubuntu 24.04 + systemd 跑同一个 jar，
 > 手机浏览器直接打开，不是本地 mock。
@@ -74,7 +74,7 @@ UPDATE parcel
 ```
 room         (id, code, name, created_at)
 member       (id, room_id, nickname, join_at, last_active)
-parcel       (id, room_id, owner_id, courier, station, pickup_code,
+parcel       (id, room_id, owner_id, station, pickup_code,
               reward, deadline, status, version, taker_id, created_at)
 parcel_event (id, parcel_id, action, by_member, at)      -- 操作流水，只追加
 notice       (id, member_id, parcel_id, type, is_read, at) -- 站内提醒

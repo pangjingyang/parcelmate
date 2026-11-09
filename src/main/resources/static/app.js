@@ -155,14 +155,13 @@ function renderParcel(p) {
   top.className = 'parcel-top';
   top.innerHTML = `
     <span class="badge ${p.status}">${p.statusLabel}</span>
-    <span class="courier">${escapeHtml(p.courier)}</span>
+    <span class="courier">${escapeHtml(p.station || p.courier || '快递')}</span>
     <span class="parcel-time">${p.createdAt}</span>
   `;
 
   const meta = document.createElement('div');
   meta.className = 'parcel-meta';
   meta.innerHTML = `
-    <span>取件点 <b>${escapeHtml(p.station)}</b></span>
     ${p.deadline ? `<span>期望 <b>${p.deadline}</b></span>` : ''}
     ${p.reward ? `<span>悬赏 <b>${escapeHtml(p.reward)}</b></span>` : ''}
   `;
@@ -287,7 +286,6 @@ function closeSheet() {
 $('#parcelForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const body = {
-    courier: $('#courier').value.trim(),
     station: $('#station').value,
     pickupCode: $('#pickupCode').value.trim(),
     deadline: $('#deadline').value,          // datetime-local 直接给 yyyy-MM-ddTHH:mm

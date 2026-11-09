@@ -44,7 +44,9 @@ public class ParcelService {
 
     /** 发布一张快递单。 */
     public ParcelView create(Member me, CreateParcelCommand cmd) {
-        String courier = require(cmd.courier(), "快递公司不能为空");
+        // 快递公司不再是必填项：用户在表单里只选"取件点"（菜鸟/京东/多多/兔喜/顺丰/邮政），
+        // 老客户端如果还传 courier 就照存；没传就存空串（这一列是 NOT NULL，空串安全）。
+        String courier = cmd.courier() == null ? "" : cmd.courier().trim();
         String station = require(cmd.station(), "取件点不能为空");
         if (courier.length() > 20 || station.length() > 20) {
             throw new BizException("快递公司 / 取件点太长了");
