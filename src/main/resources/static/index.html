@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ParcelMate · 宿舍快递代取</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ 还没加入宿舍：建房 / 加入 ============ -->
+<main id="welcome" class="welcome hidden">
+  <div class="brand">
+    <div class="brand-mark">📦</div>
+    <h1>ParcelMate</h1>
+    <p>宿舍快递代取登记<br>谁帮你拿，一清二楚</p>
+  </div>
+
+  <section class="card">
+    <h2>我是第一个</h2>
+    <p class="muted">给宿舍起个名字，拿到 6 位房间码发给室友。</p>
+    <form id="createForm">
+      <input id="roomName" maxlength="20" placeholder="宿舍名字，例如 7 栋 302" required>
+      <button type="submit" class="primary">创建宿舍</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>室友叫我加入</h2>
+    <form id="joinForm">
+      <input id="joinCode" maxlength="6" placeholder="6 位房间码" required
+             style="text-transform: uppercase; letter-spacing: .2em">
+      <input id="joinNickname" maxlength="10" placeholder="你的昵称，例如 小明" required>
+      <button type="submit" class="primary">加入宿舍</button>
+    </form>
+  </section>
+</main>
+
+<!-- ============ 已加入：主界面 ============ -->
+<div id="app" class="app hidden">
+  <header class="topbar">
+    <div>
+      <div class="room-name" id="roomNameLabel">宿舍</div>
+      <div class="room-code">房间码 <b id="roomCode">------</b> · <span id="meName">我</span></div>
+    </div>
+    <div class="avatars" id="memberAvatars"></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="active">进行中</button>
+    <button class="tab" data-tab="mine">我发布的</button>
+    <button class="tab" data-tab="taken">我接的单</button>
+    <button class="tab" data-tab="history">历史</button>
+  </nav>
+
+  <section id="list" class="list"></section>
+  <div id="empty" class="empty hidden">
+    <div class="empty-emoji">🛵</div>
+    <p>还没有单子<br><span class="muted">点右下角的 + 发布第一张快递</span></p>
+  </div>
+
+  <button id="fab" class="fab" title="发布快递">+</button>
+</div>
+
+<!-- ============ 发布快递：底部弹层 ============ -->
+<div id="sheet" class="sheet hidden">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2>发布快递</h2>
+      <button id="sheetClose" class="ghost">取消</button>
+    </div>
+    <form id="parcelForm">
+      <label>快递公司
+        <input id="courier" placeholder="中通 / 圆通 / 顺丰…" required>
+      </label>
+      <label>取件点
+        <select id="station">
+          <option>菜鸟驿站</option>
+          <option>丰巢快递柜</option>
+          <option>京东快递</option>
+          <option>其他</option>
+        </select>
+      </label>
+      <label>取件码 <span class="muted">（只有你和接单人看得到）</span>
+        <input id="pickupCode" maxlength="40" placeholder="例如 8-3-1024">
+      </label>
+      <label>期望取件时间
+        <input id="deadline" type="datetime-local">
+      </label>
+      <label>悬赏
+        <input id="reward" maxlength="20" placeholder="一杯奶茶 / 免费">
+      </label>
+      <button type="submit" class="primary">发布</button>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

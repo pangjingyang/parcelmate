@@ -1,0 +1,25 @@
+# 编译产物
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# 本地数据库（每个人的数据都不一样，不进仓库）
+data/
+*.db
+*.db-journal
+*.db-wal
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+.settings/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+logs/
