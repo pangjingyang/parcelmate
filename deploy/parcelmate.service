@@ -1,0 +1,15 @@
+[Unit]
+Description=ParcelMate 宿舍快递代取
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/parcelmate
+ExecStart=/usr/bin/java -Xms64m -Xmx256m -jar /opt/parcelmate/app.jar
+Restart=always
+RestartSec=3
+StandardOutput=append:/opt/parcelmate/app.log
+StandardError=append:/opt/parcelmate/app.log
+
+[Install]
+WantedBy=multi-user.target
