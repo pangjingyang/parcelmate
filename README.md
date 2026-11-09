@@ -1,4 +1,4 @@
-# ParcelMate · 宿舍快递代取登记
+﻿# ParcelMate · 宿舍快递代取登记
 
 > 宿舍群里那句「谁帮我取一下快递」，从满屏聊天记录变成一张能追踪状态的小卡片。
 
@@ -25,7 +25,14 @@ ParcelMate 把这个流程做成**一张卡片带状态**：
 
 | 加入宿舍 | 快递看板（手机） |
 | --- | --- |
-| ![欢迎页](docs/shots/welcome.png) | ![看板](docs/shots/app.png) |
+| ![欢迎页](docs/shots/welcome.png) | ![看板](docs/shots/app-online.png) |
+
+> 上面第二张是线上实例的真实截图：阿里云 Ubuntu 24.04 + systemd 跑同一个 jar，
+> 手机浏览器直接打开，不是本地 mock。
+
+## 在线地址
+
+<http://8.137.39.80:8080>（阿里云 ECS 试用实例，systemd 托管；演示房间码见启动后 `seed_demo.py` 的输出）
 
 ## 功能范围（一期）
 
@@ -118,7 +125,7 @@ java -jar target/parcelmate-0.1.0.jar
 - [x] W1 骨架跑通 + 建房/加入 + 快递登记
 - [x] W2 接单流转 + 版本号防重 + 站内红点
 - [ ] W3 周统计 + 手机适配打磨 + 异常状态入口
-- [ ] W4 部署上线 + 测试 + 文档截图
+- [x] W4 部署上线（阿里云 Ubuntu + systemd）+ 测试 + 文档截图
 
 ## 说明
 

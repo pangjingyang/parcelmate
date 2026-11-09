@@ -73,11 +73,12 @@ await send('Emulation.setDeviceMetricsOverride', {
 });
 
 if (cookieValue) {
+  const host = new URL(url).hostname;   // cookie 要落在截图目标域名上，不能写死 127.0.0.1
   await send('Network.enable');
   await send('Network.setCookie', {
     name: 'pm_member',
     value: String(cookieValue),
-    domain: '127.0.0.1',
+    domain: host,
     path: '/',
     httpOnly: true,
   });
