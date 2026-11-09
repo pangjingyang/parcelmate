@@ -1,4 +1,4 @@
-﻿"""ParcelMate 接口冒烟测试（端到端，只用标准库）。
+"""ParcelMate 接口冒烟测试（端到端，只用标准库）。
 
 用法：先启动服务，再 `python smoke_test.py`；末行打印 ALL OK 即通过。
 
@@ -60,10 +60,11 @@ def main():
     xiaohong, me_xh = join(code, "小红")
     print("4  join 小红 ->", me_xh["memberId"])
 
+    # 同名 = 找回原身份（换手机 / 清了 cookie / 退出后再回来都走这里），不再是 400
     dup = client()
-    st, err = call(dup, "POST", "/api/rooms/join", {"code": code, "nickname": "小明"})
-    print("5  重名 ->", st, err)
-    assert st == 400
+    st, reclaimed = call(dup, "POST", "/api/rooms/join", {"code": code, "nickname": "小明"})
+    print("5  同名重进 ->", st, "memberId =", reclaimed["memberId"], "（应等于小明的 id）")
+    assert st == 200 and reclaimed["memberId"] == me_xm["memberId"]
 
     st, err = call(dup, "POST", "/api/rooms/join", {"code": "ZZZZZZ", "nickname": "路人"})
     print("6  错房间码 ->", st, err)
@@ -184,6 +185,25 @@ def main():
     st, err = call(guest, "POST", "/api/parcels", {"station": "菜鸟驿站"})
     print("25 未加入者发快递 ->", st, err)
     assert st == 400
+
+    # ---------- 退出宿舍（换房间） ----------
+    st, body = call(xiaohong, "POST", "/api/rooms/leave")
+    print("26 小红退出宿舍 ->", st, body)
+    assert st == 200 and body["joined"] is False
+
+    st, me = call(xiaohong, "GET", "/api/me")
+    print("27 退出后的身份 ->", st, "joined =", me["joined"])
+    assert me["joined"] is False
+
+    # 退出只清身份、不删数据：用同一个码 + 同一个昵称还能回到自己的身份
+    xiaohong2, me = join(code, "小红")
+    st, lst = call(xiaohong2, "GET", "/api/parcels/history")
+    print("28 同名重进后历史单数 ->", len(lst), "（数据没被退出删掉）")
+    assert st == 200 and len(lst) >= 2
+
+    st, mine = call(xiaohong2, "GET", "/api/parcels/mine?asTaker=true")
+    print("29 同名重进后「我接的单」->", len(mine), "张（身份被找回了）")
+    assert st == 200 and len(mine) >= 1
 
     print("\nALL OK")
 

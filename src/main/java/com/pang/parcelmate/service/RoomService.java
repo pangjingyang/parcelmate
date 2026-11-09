@@ -72,9 +72,16 @@ public class RoomService {
         }
         Room room = roomRepo.findByCode(code.toUpperCase())
                 .orElseThrow(() -> new BizException("房间码不存在，问问室友是不是打错了"));
-        if (memberRepo.existsNickname(room.id(), nickname)) {
-            throw new BizException("宿舍里已经有人叫这个名字了，换一个");
+
+        // 同名 = 找回原身份。换手机、清了浏览器 cookie、点过"退出"再回来，
+        // 都靠这一步。不这么做的话，室友每换一次设备就变成一个新成员，
+        // "我发布的"就再也看不到自己以前的单子了。
+        for (Member m : memberRepo.listByRoom(room.id())) {
+            if (m.nickname().equals(nickname)) {
+                return m;
+            }
         }
+
         long memberId = memberRepo.insert(room.id(), nickname);
         return memberRepo.findById(memberId).orElseThrow();
     }

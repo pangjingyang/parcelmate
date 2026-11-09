@@ -92,6 +92,32 @@ $('#joinForm').addEventListener('submit', async (e) => {
   }
 });
 
+/* ---------------- 退出宿舍：换房间 / 室友换号 ---------------- */
+
+$('#leaveBtn').addEventListener('click', async () => {
+  const ok = confirm('退出后要重新输入房间码和昵称才能回来，确定退出吗？');
+  if (!ok) return;
+  try {
+    await api('/api/rooms/leave', { method: 'POST' });
+  } catch (err) {
+    toast(err.message);
+    return;
+  }
+  // 本地状态也一起清干净，否则会残留上一个宿舍的单子
+  state.me = { joined: false };
+  state.tab = 'active';
+  $('#list').innerHTML = '';
+  $('#app').classList.add('hidden');
+  $('#welcome').classList.remove('hidden');
+  $('#roomName').value = '';
+  $('#joinCode').value = '';
+  $('#joinNickname').value = '';
+  document.querySelectorAll('.tab').forEach((b) => {
+    b.classList.toggle('active', b.dataset.tab === 'active');
+  });
+  toast('已退出，可以换一个宿舍了');
+});
+
 /* ---------------- 主界面 ---------------- */
 
 function showApp() {

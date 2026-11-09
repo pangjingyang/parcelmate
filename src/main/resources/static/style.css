@@ -207,6 +207,24 @@ button:active { transform: scale(.985); }
   font-weight: 600;
 }
 
+/* 「退出」：低调的胶囊小按钮，放在房间码后面 */
+.link-btn {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid #d7e1db;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+.link-btn:hover {
+  border-color: #e6bdb6;
+  color: #c0392b;
+}
+
 .avatars {
   display: flex;
   flex-direction: row;

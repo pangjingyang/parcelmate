@@ -60,6 +60,25 @@ public class RoomController {
         return roomService.me(memberId);
     }
 
+    /**
+     * 退出宿舍：POST /api/rooms/leave —— 把身份 cookie 设成空并立刻过期。
+     *
+     * <p>为什么不由前端 `document.cookie = ...` 清？因为 cookie 设了 HttpOnly，
+     * JS 读不到也改不了 —— 这是有意的（防脚本偷身份），所以退出必须走服务端。
+     *
+     * <p>注意：这里**只清身份，不删数据**。你发过的快递单、成员记录都还在，
+     * 用同一个房间码 + 昵称重新进来就能看到（昵称重复会被房间挡住）。
+     */
+    @PostMapping("/rooms/leave")
+    public MeView leave(HttpServletResponse response) {
+        Cookie cookie = new Cookie(COOKIE_MEMBER, "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);           // 0 = 立刻删除
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+        return MeView.notJoined();
+    }
+
     public record CreateRoomRequest(String name) {
     }
 
