@@ -2,7 +2,9 @@
 
 > 宿舍群里那句「谁帮我取一下快递」，从满屏聊天记录变成一张能追踪状态的小卡片。
 
-![status](https://img.shields.io/badge/状态-开发中-orange) ![java](https://img.shields.io/badge/Java-21-blue) ![spring](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F) ![sqlite](https://img.shields.io/badge/SQLite-单文件-003B57)
+![status](https://img.shields.io/badge/状态-在线可访问-brightgreen) ![java](https://img.shields.io/badge/Java-21-blue) ![spring](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F) ![sqlite](https://img.shields.io/badge/SQLite-单文件-003B57) ![license](https://img.shields.io/badge/License-MIT-yellow)
+
+**在线演示**：<http://8.137.39.80:8080> —— 手机或电脑浏览器直接打开，不用装任何东西（阿里云 ECS 上跑的就是这个仓库的 jar）
 
 ## 这是什么
 
@@ -54,7 +56,7 @@ ParcelMate 把这个流程做成**一张卡片带状态**：
 | 数据访问 | Spring JDBC (`JdbcTemplate`) + 手写 SQL | 先把 SQL 写熟，再谈 ORM |
 | 数据库 | SQLite（单文件） | 宿舍 6 人量级，零安装、零运维；需要时再迁 MySQL |
 | 前端 | 原生 HTML/CSS/JS | 不引入构建链，一个人维护得动 |
-| 部署 | Render / 学生云服务器 + Docker | 目标：**能在手机上直接打开** |
+| 部署 | 阿里云 ECS（Ubuntu 24.04）+ systemd 托管 jar | 目标：**能在手机上直接打开**；systemd 开机自启，崩溃自动重启 |
 
 ## 关键设计：版本号乐观锁
 
@@ -133,4 +135,4 @@ java -jar target/parcelmate-0.1.0.jar
 
 ## License
 
-MIT
+本项目采用 **MIT** 许可证，可自由学习、修改、再发布，详见 [LICENSE](LICENSE)。
