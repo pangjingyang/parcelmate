@@ -33,8 +33,8 @@ ParcelMate 把这个流程做成**一张卡片带状态**：
 | --- | --- | --- |
 | M1 宿舍与成员 | 建房拿 6 位房间码、凭码加入、成员在线状态 | ✅ 完成 |
 | M2 快递登记 | 发布快递、进行中列表、历史列表 | ✅ 完成 |
-| M3 接单流转 | 接单 / 已取 / 已送达 / 取消，**版本号乐观锁防重复接单** | 🚧 开发中 |
-| M4 我的 | 我发布的 / 我接的 / 周统计（谁帮我最多） | 🚧 开发中 |
+| M3 接单流转 | 接单 / 已取 / 已送达 / 取消，**版本号乐观锁防重复接单** | ✅ 完成 |
+| M4 我的 | 我发布的 / 我接的 / 站内红点 | ✅ 完成（周统计属 W3） |
 
 明确**不做**的：微信/QQ 推送（做站内红点）、地图导航、在线支付、原生 App。
 理由写在 [docs/设计取舍.md](docs/设计取舍.md)：一期目标是宿舍 6 个人真能用起来，不是做一个"功能很全但没人用"的系统。
@@ -106,16 +106,18 @@ java -jar target/parcelmate-0.1.0.jar
 | GET | `/api/parcels` | 进行中的单子 |
 | GET | `/api/parcels/history` | 全部单子（含历史） |
 | GET | `/api/parcels/mine?asTaker=true` | 我发布的 / 我接的 |
-| POST | `/api/parcels/{id}/take` | 接单（W2） |
-| POST | `/api/parcels/{id}/pick` | 已取（W2） |
-| POST | `/api/parcels/{id}/deliver` | 已送达（W2） |
-| POST | `/api/parcels/{id}/cancel` | 取消（W2） |
+| POST | `/api/parcels/{id}/take` | 接单（状态 + 版本号条件更新） |
+| POST | `/api/parcels/{id}/pick` | 接单人确认「已取到」 |
+| POST | `/api/parcels/{id}/deliver` | 发布者确认「已收到」 |
+| POST | `/api/parcels/{id}/cancel` | 取消（仅待接时） |
+| GET | `/api/notices` | 我的未读提醒 |
+| POST | `/api/notices/read` | 全部标记已读 |
 
 ## 开发路线
 
 - [x] W1 骨架跑通 + 建房/加入 + 快递登记
-- [ ] W2 接单流转 + 版本号防重 + 站内红点
-- [ ] W3 我的页面 + 周统计 + 手机适配打磨
+- [x] W2 接单流转 + 版本号防重 + 站内红点
+- [ ] W3 周统计 + 手机适配打磨 + 异常状态入口
 - [ ] W4 部署上线 + 测试 + 文档截图
 
 ## 说明

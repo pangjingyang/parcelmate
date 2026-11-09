@@ -2,7 +2,9 @@ package com.pang.parcelmate.service;
 
 import com.pang.parcelmate.domain.Member;
 import com.pang.parcelmate.domain.Parcel;
+import com.pang.parcelmate.domain.ParcelStatus;
 import com.pang.parcelmate.repo.MemberRepository;
+import com.pang.parcelmate.repo.NoticeRepository;
 import com.pang.parcelmate.repo.ParcelEventRepository;
 import com.pang.parcelmate.repo.ParcelRepository;
 import com.pang.parcelmate.web.dto.ParcelView;
@@ -30,11 +32,14 @@ public class ParcelService {
     private final ParcelRepository parcelRepo;
     private final ParcelEventRepository eventRepo;
     private final MemberRepository memberRepo;
+    private final NoticeRepository noticeRepo;
 
-    public ParcelService(ParcelRepository parcelRepo, ParcelEventRepository eventRepo, MemberRepository memberRepo) {
+    public ParcelService(ParcelRepository parcelRepo, ParcelEventRepository eventRepo,
+                         MemberRepository memberRepo, NoticeRepository noticeRepo) {
         this.parcelRepo = parcelRepo;
         this.eventRepo = eventRepo;
         this.memberRepo = memberRepo;
+        this.noticeRepo = noticeRepo;
     }
 
     /** 发布一张快递单。 */
@@ -90,25 +95,97 @@ public class ParcelService {
      * 这正是版本号要解决的问题（W2 会画时间线讲）。
      */
     public ParcelView take(Member me, long parcelId) {
-        throw new UnsupportedOperationException("W2 任务：接单逻辑由你来写，见方法注释");
+        Parcel parcel = load(parcelId, me);
+        if (parcel.ownerId() == me.id()) {
+            throw new BizException("自己的快递不能自己接");
+        }
+        if (parcel.status() != ParcelStatus.OPEN) {
+            throw new BizException("这单已经是「" + parcel.status().getLabel() + "」，接不了了");
+        }
+
+        // 关键：一条 SQL 完成「检查 + 抢占」，靠受影响行数判断谁赢了
+        int updated = parcelRepo.takeIfOpen(parcelId, parcel.version(), me.id());
+        if (updated == 0) {
+            throw new BizException("手慢了，这单刚被别人接走");
+        }
+
+        eventRepo.append(parcelId, "TAKEN", me.id());
+        noticeRepo.insert(parcel.ownerId(), parcelId, "TAKEN");
+        return view(parcelId, me);
     }
 
     /** 已取：接单人从驿站拿到包裹。W2。 */
     public ParcelView pick(Member me, long parcelId) {
-        throw new UnsupportedOperationException("W2 任务：已取逻辑由你来写");
+        Parcel parcel = load(parcelId, me);
+        if (parcel.takerId() == null || parcel.takerId() != me.id()) {
+            throw new BizException("只有接单人能确认「已取到」");
+        }
+        if (parcel.status() != ParcelStatus.TAKEN) {
+            throw new BizException("当前是「" + parcel.status().getLabel() + "」，不能确认已取");
+        }
+        int updated = parcelRepo.transit(parcelId, ParcelStatus.TAKEN, ParcelStatus.PICKED, parcel.version());
+        if (updated == 0) {
+            throw new BizException("状态刚变过，刷新一下再试");
+        }
+        eventRepo.append(parcelId, "PICKED", me.id());
+        noticeRepo.insert(parcel.ownerId(), parcelId, "PICKED");
+        return view(parcelId, me);
     }
 
     /** 已送达：包裹交到发布者手里。W2。 */
     public ParcelView deliver(Member me, long parcelId) {
-        throw new UnsupportedOperationException("W2 任务：已送达逻辑由你来写");
+        Parcel parcel = load(parcelId, me);
+        if (parcel.ownerId() != me.id()) {
+            throw new BizException("只有发布者能确认「已收到」");
+        }
+        if (parcel.status() != ParcelStatus.PICKED) {
+            throw new BizException("当前是「" + parcel.status().getLabel() + "」，不能确认收货");
+        }
+        int updated = parcelRepo.transit(parcelId, ParcelStatus.PICKED, ParcelStatus.DELIVERED, parcel.version());
+        if (updated == 0) {
+            throw new BizException("状态刚变过，刷新一下再试");
+        }
+        eventRepo.append(parcelId, "DELIVERED", me.id());
+        if (parcel.takerId() != null) {
+            noticeRepo.insert(parcel.takerId(), parcelId, "DELIVERED");
+        }
+        return view(parcelId, me);
     }
 
     /** 取消：只有发布者能取消，且只能取消还没被接的单。W2。 */
     public ParcelView cancel(Member me, long parcelId) {
-        throw new UnsupportedOperationException("W2 任务：取消逻辑由你来写");
+        Parcel parcel = load(parcelId, me);
+        if (parcel.ownerId() != me.id()) {
+            throw new BizException("只有发布者能取消这张单");
+        }
+        if (parcel.status() != ParcelStatus.OPEN) {
+            throw new BizException("已经有人接了，不能直接取消");
+        }
+        int updated = parcelRepo.transit(parcelId, ParcelStatus.OPEN, ParcelStatus.CANCELED, parcel.version());
+        if (updated == 0) {
+            throw new BizException("状态刚变过，刷新一下再试");
+        }
+        eventRepo.append(parcelId, "CANCELED", me.id());
+        return view(parcelId, me);
     }
 
     // ========================= 下面是工具方法 =========================
+
+    /** 取出单子并确认它属于我这个宿舍，否则别人猜 id 就能操作别的宿舍。 */
+    private Parcel load(long parcelId, Member me) {
+        Parcel parcel = parcelRepo.findById(parcelId)
+                .orElseThrow(() -> new BizException("没有这张单子"));
+        if (parcel.roomId() != me.roomId()) {
+            throw new BizException("这张单不在你的宿舍");
+        }
+        return parcel;
+    }
+
+    private ParcelView view(long parcelId, Member me) {
+        Parcel fresh = parcelRepo.findById(parcelId).orElseThrow(() -> new BizException("没有这张单子"));
+        return toViews(me.roomId(), List.of(fresh), me.id()).get(0);
+    }
+
 
     /** 一次把昵称查出来，避免每条单子都查一次库（N+1 查询）。 */
     private List<ParcelView> toViews(long roomId, List<Parcel> parcels, long viewerId) {

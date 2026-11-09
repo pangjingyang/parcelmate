@@ -43,7 +43,12 @@
       <div class="room-name" id="roomNameLabel">宿舍</div>
       <div class="room-code">房间码 <b id="roomCode">------</b> · <span id="meName">我</span></div>
     </div>
-    <div class="avatars" id="memberAvatars"></div>
+    <div class="topbar-right">
+      <button id="bell" class="bell" title="消息">
+        🔔<span id="bellDot" class="bell-dot hidden"></span>
+      </button>
+      <div class="avatars" id="memberAvatars"></div>
+    </div>
   </header>
 
   <nav class="tabs">
@@ -96,6 +101,17 @@
 </div>
 
 <div id="toast" class="toast hidden"></div>
+
+<!-- ============ 消息（站内提醒） ============ -->
+<div id="noticeSheet" class="sheet hidden">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2>消息</h2>
+      <button id="noticeClose" class="ghost">关闭</button>
+    </div>
+    <div id="noticeList" class="notice-list"></div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

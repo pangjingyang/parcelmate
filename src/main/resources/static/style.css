@@ -140,6 +140,62 @@ button:active { transform: scale(.985); }
   font-weight: 700;
   letter-spacing: -.01em;
 }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.bell {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+.bell-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid #fff;
+}
+
+.notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  overflow: auto;
+}
+.notice-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f6f8f7;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.notice-item time {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-empty {
+  padding: 28px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
 .room-code {
   margin-top: 3px;
   font-size: 12px;

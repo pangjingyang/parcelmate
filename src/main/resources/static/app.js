@@ -49,6 +49,7 @@ async function boot() {
   if (state.me.joined) {
     showApp();
     await loadList();
+    refreshBell();
   } else {
     $('#welcome').classList.remove('hidden');
   }
@@ -219,8 +220,54 @@ async function act(parcelId, action) {
     await api(`/api/parcels/${parcelId}/${action}`, { method: 'POST' });
     toast('操作成功');
     await loadList();
+    refreshBell();
   } catch (err) {
     toast(err.message);
+  }
+}
+
+/* ---------------- 消息（站内提醒） ---------------- */
+
+$('#bell').addEventListener('click', openNotices);
+$('#noticeClose').addEventListener('click', () => $('#noticeSheet').classList.add('hidden'));
+$('#noticeSheet').addEventListener('click', (e) => {
+  if (e.target.id === 'noticeSheet') $('#noticeSheet').classList.add('hidden');
+});
+
+function renderBell(unread) {
+  $('#bellDot').classList.toggle('hidden', unread === 0);
+}
+
+async function refreshBell() {
+  try {
+    const list = await api('/api/notices');
+    renderBell(list.length);
+  } catch {
+    /* 没加入宿舍时不用管 */
+  }
+}
+
+async function openNotices() {
+  const box = $('#noticeList');
+  box.innerHTML = '<div class="notice-empty">加载中…</div>';
+  $('#noticeSheet').classList.remove('hidden');
+  try {
+    const list = await api('/api/notices');
+    box.innerHTML = '';
+    if (list.length === 0) {
+      box.innerHTML = '<div class="notice-empty">还没有新消息</div>';
+    }
+    list.forEach((n) => {
+      const item = document.createElement('div');
+      item.className = 'notice-item';
+      item.innerHTML = `${escapeHtml(n.text)}<time>${escapeHtml(n.at)}</time>`;
+      box.appendChild(item);
+    });
+    // 看过就算已读
+    await api('/api/notices/read', { method: 'POST' });
+    renderBell(0);
+  } catch (err) {
+    box.innerHTML = `<div class="notice-empty">${escapeHtml(err.message)}</div>`;
   }
 }
 

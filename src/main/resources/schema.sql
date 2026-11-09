@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS notice (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
     member_id INTEGER NOT NULL REFERENCES member(id),
     parcel_id INTEGER REFERENCES parcel(id),
-    type      TEXT NOT NULL,          -- PARCEL_TAKEN / PARCEL_PICKED / PARCEL_DELIVERED ...
+    type      TEXT NOT NULL,          -- TAKEN / PICKED / DELIVERED / CANCELED（文案在 NoticeService 里翻译）
     is_read   INTEGER NOT NULL DEFAULT 0,
     at        TEXT NOT NULL
 );
