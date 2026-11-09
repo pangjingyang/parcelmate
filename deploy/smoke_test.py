@@ -1,4 +1,4 @@
-"""ParcelMate 接口冒烟测试（端到端，只用标准库）。
+﻿"""ParcelMate 接口冒烟测试（端到端，只用标准库）。
 
 用法：先启动服务，再 `python smoke_test.py`；末行打印 ALL OK 即通过。
 
@@ -71,7 +71,7 @@ def main():
 
     # ---------- 发布与隐私 ----------
     st, p = call(xiaoming, "POST", "/api/parcels", {
-        "courier": "中通", "station": "菜鸟驿站", "pickupCode": "8-3-1024",
+        "station": "菜鸟驿站", "pickupCode": "8-3-1024",
         "deadline": "2026-11-09T20:30", "reward": "一杯奶茶",
     })
     pid = p["id"]
@@ -136,7 +136,7 @@ def main():
 
     # ---------- 取消 ----------
     st, p2 = call(xiaoming, "POST", "/api/parcels", {
-        "courier": "顺丰", "station": "丰巢快递柜", "pickupCode": "A12-4471",
+        "station": "顺丰快递", "pickupCode": "A12-4471",
     })
     pid2 = p2["id"]
     st, err = call(xiaohong, "POST", f"/api/parcels/{pid2}/cancel")
@@ -149,7 +149,7 @@ def main():
 
     # ---------- 并发：5 个人同时抢同一张单 ----------
     st, p3 = call(xiaoming, "POST", "/api/parcels", {
-        "courier": "圆通", "station": "菜鸟驿站", "pickupCode": "9-9-9999",
+        "station": "多多驿站", "pickupCode": "9-9-9999",
     })
     pid3 = p3["id"]
     racers = [join(code, f"室友{i}")[0] for i in range(1, 6)]
@@ -181,7 +181,7 @@ def main():
     assert final["version"] == 1
 
     # ---------- 未加入者 ----------
-    st, err = call(guest, "POST", "/api/parcels", {"courier": "中通", "station": "菜鸟驿站"})
+    st, err = call(guest, "POST", "/api/parcels", {"station": "菜鸟驿站"})
     print("25 未加入者发快递 ->", st, err)
     assert st == 400
 
